@@ -72,15 +72,39 @@
 
     <div class="container">
         상세페이지임 
+        
         <div class="detail-pic my-4" style="background-image: url('https://picsum.photos/400');"></div>
         <div>
-        <h5>올린사람 : 모름</h5>
+        <h5 class="userName">올린사람 : 모름</h5>
         <hr>
         <h5 class="title">상품명</h5>
         <p class="date">올린날짜</p>
-        <p class="price">가격</p>
+        <p class="price">내용</p>
+        <button id="edit">수정하기</button>
+        <button id="chat">채팅하기</button>
         </div>
     </div>
+
+
+    <script>
+
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        var 쿼리스트링 = new URLSearchParams(window.location.search)
+
+        db.collection('todo').doc(쿼리스트링.get('id')).get().then((result)=>{
+          console.log(result.data())
+          $('.title').html(result.data().제목)
+          $('.userName').html(result.data().작성자)
+          $('.price').html(result.data().내용)
+          $('.detail-pic').css('background-image','url(${result.data().이미지})')
+        }) 
+        
+        $('#edit').click(function(){
+          window.location.href = '/edit.html?id=' + 쿼리스트링.get('id')
+        })
+        
       
 
     </script>

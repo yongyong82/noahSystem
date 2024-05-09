@@ -13,6 +13,7 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">한국노아</a>
+        <span class="ms-auto mx-2" id="userName"></span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -91,26 +92,49 @@
         <input type="password" class="form-control" placeholder="pw" id="pw">
       </div>
       <button type="submit" class="btn btn-primary" id="login">로그인하기</button>
-      <button type="submit" class="btn btn-primary" id="logout">로그인아웃</button>
+      <button type="submit" class="btn btn-primary" id="logout">로그아웃</button>
+      <button type="submit" class="btn btn-primary" id="registerButton">가입하기</button>
    </div>
 
 
     <script>
 
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        const storage = firebase.storage();        
+
+        firebase.auth().onAuthStateChanged((user)=>{
+          if (user) {
+            console.log(user.id)
+            console.log(user.displayName)
+           
+            localStorage.setItem('user', JSON.stringify(user))
+
+             //유저정보 확인
+            var 뺀거 = localStorage.getItem('user')
+            $('#userName').html(JSON.parse(뺀거).displayName)
+          }
+        })
+
+       
+
         
         $('#register').click(function(){
-  
-        var 이메일 = $('#email-new').val();
-        var 패스워드 = $('#pw-new').val();
-        var 이름 = $('#name-new').val();
 
-        firebase.auth().createUserWithEmailAndPassword(이메일, 패스워드).then((result)=>{
-          console.log(result.user)
-          result.user.updateProfile({displayName :이름 })
+          window.location.href = "/register.html"
+    
+          var 이메일 = $('#email-new').val();
+          var 패스워드 = $('#pw-new').val();
+          var 이름 = $('#name-new').val();
+
+          firebase.auth().createUserWithEmailAndPassword(이메일, 패스워드).then((result)=>{
+
+            var 유저정보 = { name : 이름, email : 이메일 }
+            db.collection('user').doc(result.user.uid).set(유저정보)
+
+            console.log(result.user)
+            result.user.updateProfile({displayName :이름 })
+          })
         })
-      })
         
       $('#login').click(function(){
   
@@ -124,6 +148,7 @@
 
       $('#logout').click(function(){
         firebase.auth().signOut()
+        localStorage.removeItem('user') 
       })
       
 

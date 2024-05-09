@@ -47,9 +47,6 @@
       </div>
     </nav>
 
-  
-
-
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
@@ -73,61 +70,37 @@
       firebase.initializeApp(firebaseConfig);
     </script>
 
-<div class="container mt-3">
-  <input type="text" class="form-control mt-2" id="title" placeholder="제목">
-  <textarea class="form-control mt-2" id="content" placeholder="내용"></textarea>
-  <input type="text" class="form-control mt-2" id="wuser" placeholder="작성자">
-  <input class="form-control mt-2" type="file" id="image">
-  <button class="btn btn-danger mt-3" id="send">올리기</button>
-</div>
+    <div class="container">
+        상세페이지임 
+        <button id="edit">수정하기</button>
+        <div class="detail-pic my-4" style="background-image: url('https://picsum.photos/400');"></div>
+        <div>
+        <h5 class="userName">올린사람 : 모름</h5>
+        <hr>
+        <h5 class="title">상품명</h5>
+        <p class="date">올린날짜</p>
+        <p class="price">내용</p>
+        </div>
+    </div>
+
 
     <script>
 
         const db = firebase.firestore();
         const storage = firebase.storage();
+
+        var 쿼리스트링 = new URLSearchParams(window.location.search)
         
-        $('#send').click(function(){
-
-          var file = document.querySelector('#image').files[0];
-          var storageRef = storage.ref();
-          var 저장할경로 = storageRef.child('image/' + file.name);
-          var 업로드작업 = 저장할경로.put(file)
-
-          업로드작업.on( 'state_changed', 
-              // 변화시 동작하는 함수 
-              null, 
-              //에러시 동작하는 함수
-              (error) => {
-                console.error('실패사유는', error);
-              }, 
-              // 성공시 동작하는 함수
-              () => {
-                업로드작업.snapshot.ref.getDownloadURL().then((url) => {
-                  console.log('업로드된 경로는', url);
-
-                  var uploads = {
-                    내용 : $("#content").val(),
-                    작성자 : JSON.parse(localStorage.getItem('user')).displayName,
-                    제목 : $("#title").val(),
-                    날짜 : new Date(),
-                    이미지 : url,
-                    uid : JSON.parse(localStorage.getItem('user')).uid
-                  }
-                  db.collection("todo").add(uploads).then((result)=>{
-                    console.log(result)
-                    window.location.href = "/index.html"
-                  }).catch((err)=>{
-                    console.log(err)
-                  }) 
-
-
-
-
-                });
-              }
-          );
-
-           
+        db.collection('todo').doc(쿼리스트링.get('id')).get().then((result)=>{
+          console.log(result.data())
+          $('.title').html(result.data().제목)
+          $('.userName').html(result.data().작성자)
+          $('.price').html(result.data().내용)
+          $('.detail-pic').css('background-image','url(${result.data().이미지})')
+        }) 
+        
+        $('#edit').click(function(){
+          window.location.href = '/edit.html?id=' + 쿼리스트링.get('id')
         })
         
       
