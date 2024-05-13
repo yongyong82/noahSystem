@@ -47,6 +47,17 @@
       </div>
     </nav>
 
+    <div class="container mt-3">
+      <div class="mb-3">
+        <input type="email" class="form-control" placeholder="email" id="email">
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control" placeholder="pw" id="pw">
+      </div>
+      <button type="submit" class="btn btn-primary" id="login">로그인하기</button>
+      <button type="submit" class="btn btn-primary" id="registerButton">가입하기</button>
+   </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
@@ -69,18 +80,6 @@
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
     </script>
-
-    <div class="container mt-3">
-      <div class="mb-3">
-        <input type="email" class="form-control" placeholder="email" id="email">
-      </div>
-      <div class="mb-3">
-        <input type="password" class="form-control" placeholder="pw" id="pw">
-      </div>
-      <button type="submit" class="btn btn-primary" id="login">로그인하기</button>
-      <button type="submit" class="btn btn-primary" id="registerButton">가입하기</button>
-   </div>
-
 
     <script>
 

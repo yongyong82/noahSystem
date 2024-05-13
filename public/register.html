@@ -48,6 +48,19 @@
       </div>
     </nav>
 
+    <div class="container mt-3">
+      <div class="mb-3">
+        <input type="text" class="form-control" placeholder="name" id="name-new">
+      </div>
+      <div class="mb-3">
+        <input type="email" class="form-control" placeholder="email" id="email-new">
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control" placeholder="pw" id="pw-new">
+      </div>
+      <button type="submit" class="btn btn-primary" id="register">가입하기</button>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
@@ -71,53 +84,30 @@
       firebase.initializeApp(firebaseConfig);
     </script>
 
-    <div class="container mt-3">
-      <div class="mb-3">
-        <input type="text" class="form-control" placeholder="name" id="name-new">
-      </div>
-      <div class="mb-3">
-        <input type="email" class="form-control" placeholder="email" id="email-new">
-      </div>
-      <div class="mb-3">
-        <input type="password" class="form-control" placeholder="pw" id="pw-new">
-      </div>
-      <button type="submit" class="btn btn-primary" id="register">가입하기</button>
-    </div>
+    
 
     <script>
 
       const db = firebase.firestore();
       const storage = firebase.storage();
 
-        // firebase.auth().onAuthStateChanged((user)=>{
-        //   if (user) {
-        //     console.log(user.id)
-        //     console.log(user.displayName)
-           
-        //     localStorage.setItem('user', JSON.stringify(user))
+      $('#register').click(function(){        
 
-        //      //유저정보 확인
-        //     var 뺀거 = localStorage.getItem('user')
-        //     $('#userName').html(JSON.parse(뺀거).displayName)
-        //   }
-        // })
-      $('#register').click(function(){
+          var userEmail = $('#email-new').val();
+          var userPasswd = $('#pw-new').val();
+          var userName = $('#name-new').val();
 
-        var userEmail = $('#email-new').val();
-        var userPasswd = $('#pw-new').val();
-        var userName = $('#name-new').val();
+          firebase.auth().createUserWithEmailAndPassword(userEmail, userPasswd).then((result)=>{
+            
+            var userdateinfo = { name : userName, email : userEmail }
+            db.collection('user').doc(result.user.uid).set(userdateinfo)
+            
+            console.log(result.user)
+            result.user.updateProfile({displayName : userName })
 
-        firebase.auth().createUserWithEmailAndPassword(userEmail, userPasswd).then((result)=>{
-
-          var userdateinfo = { name : userName, email : userEmail }
-          db.collection('user').doc(result.user.uid).set(userdateinfo)
-
-          console.log(result.user)
-          result.user.updateProfile({displayName : userName })
-
-          
-        })
-        //window.location.href = "/list.html"
+          })
+          alert("가입되었습니다.")
+          //window.location.href = "/index.html"
         
       })
       
