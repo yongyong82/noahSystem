@@ -75,7 +75,7 @@
     <div class="container">
         상세페이지임 
         
-        <div class="detail-pic my-4" style="background-image: url('https://picsum.photos/400');"></div>
+        <div class="detail-pic my-4" style="background-image : url('https://picsum.photos/400');"></div>
         <div>
           <h5 class="userName">올린사람 : 모름</h5>
           <h5 class="title">상품명</h5>
@@ -107,21 +107,40 @@
         })
 
         var queryString = new URLSearchParams(window.location.search)
+        var touid;
+        var totitle;
+        var tourl;
 
         db.collection('todo').doc(queryString.get('id')).get().then((result)=>{
           console.log(result.data())
+
+          touid = result.data().uid
+          totitle = result.data().title
+          tourl = result.data().url
+
+          alert(tourl)
+
           $('.title').html(result.data().title)
           $('.userName').html(result.data().write)
           $('.content').html(result.data().content)
           $('.date').html(result.data().date)
-          $('.detail-pic').css('background-image','url(${result.data().url})')
+          $('.detail-pic').css("background-image",url(tourl))
+
         }) 
         
         $('#edit').click(function(){
           window.location.href = '/edit.html?id=' + queryString.get('id')
         })
+
+        var myuid = JSON.parse(localStorage.getItem('user')).uid
         
-      
+        var data = {
+          from : myuid,
+          to : touid,
+          title :totitle,
+          date : new Date()
+        }
+        db.collection('chatroom').add(data)
 
     </script>
 

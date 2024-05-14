@@ -98,7 +98,7 @@
 
           var file = document.querySelector('#image').files[0];
           var storageRef = storage.ref();
-          var filelocation = storageRef.child('image/' + hours + minutes + seconds + milliseconds + '_' + file.name );
+          var filelocation = storageRef.child('image/'+file.name );
           var uploadopteration = filelocation.put(file)
 
           uploadopteration.on( 'state_changed', 
