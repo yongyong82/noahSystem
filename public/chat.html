@@ -18,6 +18,7 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
@@ -41,6 +42,7 @@
               <a class="nav-link disabled" aria-disabled="true">Disabled</a>
             </li>
           </ul>
+          
           <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Search</button>
@@ -48,6 +50,8 @@
         </div>
       </div>
     </nav>
+
+     
 
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
@@ -72,28 +76,37 @@
       firebase.initializeApp(firebaseConfig);
     </script>
 
-    <div class="container">
-        상세페이지임 
-        
-        <div class="detail-pic my-4" style="background-image : url('https://picsum.photos/400');"></div>
-        <div>
-          <h5 class="userName">올린사람 : 모름</h5>
-          <h5 class="title">상품명</h5>
-          <p class="content">내용</p>
-          <p class="date">올린날짜</p>
-
-          <button id="edit">수정하기</button>
-          <button id="chat">채팅하기</button>
-        </div><hr>
-    </div>
-
+    <div class="container p-4 detail">
+      <div class="row">
+        <div class="col-3 p-0">
+          <ul class="list-group chat-list">
+            
+          </ul>
+        </div>
+        <div class="col-9 p-0">
+          <div class="chat-room">
+            <ul class="list-group chat-content">
+              <li><span class="chat-box">채팅방1 내용</span></li>
+              <li><span class="chat-box">채팅방1 내용</span></li>
+              <li><span class="chat-box mine">채팅방1 내용</span></li>
+            </ul>
+            <div class="input-group">
+              <input class="form-control" id="chat-input">
+              <button class="btn btn-secondary" id="send">전송</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
 
     <script>
 
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+      const db = firebase.firestore();
+      const storage = firebase.storage();
+      
+      var myuid = JSON.parse(localStorage.getItem('user')).uid
 
-        firebase.auth().onAuthStateChanged((user)=>{
+      firebase.auth().onAuthStateChanged((user)=>{
           if (user) {
             console.log(user.id)
             console.log(user.displayName)
@@ -104,51 +117,91 @@
             var getthing = localStorage.getItem('user')
             $('#userName').html(JSON.parse(getthing).displayName)
           }
-        })
+      })
 
-        var queryString = new URLSearchParams(window.location.search)
-        var touid;
-        var totitle;
-        var tourl;
+      var chatid;
 
-        db.collection('todo').doc(queryString.get('id')).get().then((result)=>{
-          console.log(result.data())
-
-          touid = result.data().uid
-          totitle = result.data().title
-          tourl = result.data().url
-
-          alert(tourl)
-
-          $('.title').html(result.data().title)
-          $('.userName').html(result.data().write)
-          $('.content').html(result.data().content)
-          $('.date').html(result.data().date)
-          $('.detail-pic').css("background-image",url(tourl))
-
-        }) 
+      db.collection('chatroom').get().then((result)=>{
+      //db.collection('chatroom').where('who','array-contains',myuid).get().then((result)=>{  
         
-        $('#edit').click(function(){
-          window.location.href = '/edit.html?id=' + queryString.get('id')
+        result.forEach((doc)=>{
+          console.log(doc.data())
+          var templet = `<li class="list-group-item">
+                            <h6>${doc.data().title} </h6>
+                            <h6 class="text-small">${doc.id}</h6>
+                         </li>`;
+          $('.chat-list').append(templet)
+
+          $('.list-group-item').click(function(e){
+
+            chatid = $(this).children('.text-small').text();
+
+            //alert(chatid)
+
+            e.stopImmediatePropagation();
+            
+
+            db.collection('chatroom').doc(chatid).collection('messages').orderBy('date','desc').onSnapshot((result)=>{
+              $('.chat-content').html('');
+              result.forEach((a)=>{
+                console.log(a.data())
+                
+                var templetA = `<li><span class="chat-box mine">${a.data.content}</span></li>`;
+                $('.chat-content').append(templetA)
+
+
+              })
+            })
+
+          })
+        
         })
+      
+      })
 
-        var myuid = JSON.parse(localStorage.getItem('user')).uid
+      $('#send').click(function(){
 
-        $('#chat').click(function(){
-          var data = {
-            who : [myuid,touid],
-            title :totitle,
-            date : new Date()
-          }
-          db.collection('chatroom').add(data)
-        })
+        var messageinfo = {
+          content : $('#chat-input').val(),
+          date : new Date() ,
+          uid : myuid,
 
-        $('#logout').click(function(){
+        }
+        db.collection('chatroom').doc(chatid).collection('messages').add({messageinfo})
+
+
+
+        
+      })
+
+
+      // db.collection('todo').get().then((result)=>{
+
+      //   result.forEach((doc)=>{
+      //     console.log(doc.data())
+      //     var templet = `<div class="product">
+      //                       <div class="thumbnail" style="background-image: url('${doc.data().url}')"></div>
+      //                       <div class="flex-grow-1 p-4">
+      //                         <h5 class="title"><a href="/detail.html?id=${doc.id}"> ${doc.data().title} </a></h5>
+      //                         <p class="price">${doc.data().content}</p>
+      //                         <p class="price">${doc.data().write}</p>
+      //                         <p class="date">${doc.data().date}</p>
+      //                         <p class="float-end">?0</p>
+                              
+      //                       </div>
+                            
+      //                     </div><hr>`;
+      //     $('.container').append(templet)
+      //   })
+      // })
+
+      $('#logout').click(function(){
           firebase.auth().signOut()
           localStorage.removeItem('user')
           window.location.href = "/index.html"
-        })
+      })
 
+      
 
     </script>
 
