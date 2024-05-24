@@ -119,7 +119,8 @@
                             title : $("#title").val(),
                             date : savetime,
                             url : url,
-                            uid : JSON.parse(localStorage.getItem('user')).uid
+                            uid : JSON.parse(localStorage.getItem('user')).uid,
+                            who : [JSON.parse(localStorage.getItem('user')).uid]
                           }
 
                           db.collection("todo").add(uploads).then((result)=>{

@@ -74,18 +74,38 @@
 
     <div class="container">
         상세페이지임 
-        
-        <div class="detail-pic my-4" style="background-image : url('https://picsum.photos/400');"></div>
-        <div>
-          <h5 class="userName">올린사람 : 모름</h5>
-          <h5 class="title">상품명</h5>
-          <p class="content">내용</p>
-          <p class="date">올린날짜</p>
+        <div class="aimg"></div>
+          <div></div>
+          <div>
+            <h5 class="userName">올린사람 : </h5>
+            <h5 class="title">제목</h5>
+            <p class="content">내용</p>
+            <p class="date">올린날짜</p>
 
-          <button id="edit">수정하기</button>
-          <button id="chat">채팅하기</button>
-        </div><hr>
+            <button id="edit">수정하기</button>
+            <button id="chat">채팅하기</button>
+          </div>
+        
+        <hr>
     </div>
+    <div class="container p-4 detail">
+      <div class="row">
+        
+        <div class="col-9 p-0">
+          <div class="chat-room">
+            <ul class="list-group chat-content">
+              <li><span class="chat-box">채팅방1 내용</span></li>
+              <li><span class="chat-box">채팅방1 내용</span></li>
+              <li><span class="chat-box mine">채팅방1 내용</span></li>
+            </ul>
+            <div class="input-group">
+              <input class="form-control" id="chat-input">
+              <button class="btn btn-secondary" id="send">전송</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
 
 
     <script>
@@ -118,13 +138,15 @@
           totitle = result.data().title
           tourl = result.data().url
 
-          alert(tourl)
-
           $('.title').html(result.data().title)
           $('.userName').html(result.data().write)
           $('.content').html(result.data().content)
           $('.date').html(result.data().date)
-          $('.detail-pic').css("background-image",url(tourl))
+          //$('.detail-pic').css("background-image",url(tourl))
+
+          //var templet = `<div class="thumbnail" style="background-image: url('${result.data().url}')"></div>`;
+          var templet = `<img src = ${tourl} style="width=400px, height=300px;"/>`;
+          $('.aimg').append(templet)
 
         }) 
         
@@ -134,7 +156,31 @@
 
         var myuid = JSON.parse(localStorage.getItem('user')).uid
 
+
+        // $(document).ready(function(){
+        //   //실행내용
+        //   var data = {
+        //     who : [myuid,touid],
+        //     title :totitle,
+        //     date : new Date()
+        //   }
+        //   db.collection('chatroom').add(data)
+
+        // })
+
+       //실행내용
+        var data = {
+          who : [myuid,touid],
+          title :totitle,
+          date : new Date()
+        }
+        db.collection('chatroom').add(data)
+
+
         $('#chat').click(function(){
+
+          alert(myuid);
+          alert(touid);
           var data = {
             who : [myuid,touid],
             title :totitle,
